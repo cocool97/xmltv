@@ -11,4 +11,4 @@ repository = "https://github.com/cocool97/xmltv"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-simple-xml-builder = "*"
+xml-builder = "*"
