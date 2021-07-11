@@ -1,14 +1,15 @@
 [package]
-name = "xmltv"
+name = "xmltv-rs"
 version = "0.1.0"
 authors = ["LIAUD Corentin <corentin.liaud@orange.fr>"]
 description = "XMLTV builder/writer"
 readme = "README.md"
 license = "MIT"
 edition = "2018"
-repository = "https://github.com/cocool97/xmltv"
+repository = "https://github.com/cocool97/xmltv-rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# xml-builder = { version = "*", path = "../xml-builder" }
 xml-builder = "*"
