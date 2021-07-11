@@ -1,4 +1,4 @@
-use crate::{XMLTVChannelDisplayName, xmltv_error::Result};
+use crate::{xmltv_error::Result, XMLTVChannelDisplayName};
 use xml_builder::XMLElement;
 
 pub struct XMLTVChannel {
@@ -6,7 +6,7 @@ pub struct XMLTVChannel {
     id: String,
     display_names: Vec<XMLTVChannelDisplayName>,
     icons: Vec<String>,
-    urls: Vec<String>
+    urls: Vec<String>,
 }
 
 impl XMLTVChannel {
@@ -16,7 +16,7 @@ impl XMLTVChannel {
             id,
             display_names: vec![display_name],
             icons: vec![],
-            urls: vec![]
+            urls: vec![],
         }
     }
 
@@ -65,7 +65,7 @@ impl XMLTVChannel {
 
         for icon in self.icons {
             let mut child = XMLElement::new("icon");
-            child.add_text(icon).unwrap();
+            child.add_attribute("src", &icon);
 
             xml_channel.add_child(child).unwrap();
         }

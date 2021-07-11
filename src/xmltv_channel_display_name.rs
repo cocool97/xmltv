@@ -5,10 +5,7 @@ pub struct XMLTVChannelDisplayName {
 
 impl XMLTVChannelDisplayName {
     pub fn new(name: String, lang: Option<String>) -> Self {
-        XMLTVChannelDisplayName {
-            name,
-            lang
-        }
+        XMLTVChannelDisplayName { name, lang }
     }
 
     pub fn name(&self) -> String {

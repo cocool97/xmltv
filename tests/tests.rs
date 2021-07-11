@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use xmltv_rs::{XMLTV, XMLTVChannel, XMLTVChannelDisplayName};
+    use xmltv_rs::{XMLTVChannel, XMLTVChannelDisplayName, XMLTV};
 
     #[test]
     fn test_empty_xmltv() {
@@ -33,10 +33,7 @@ mod tests {
         let mut xmltv = XMLTV::new();
         xmltv.add_generator_info_name("xmltv-rs".into());
 
-        let display_name = XMLTVChannelDisplayName::new(
-            "TF1".into(), 
-            None,
-        );
+        let display_name = XMLTVChannelDisplayName::new("TF1".into(), None);
 
         let channel = XMLTVChannel::new("TF1".into(), "1".into(), display_name);
         xmltv.add_channel(channel).unwrap();
@@ -59,22 +56,30 @@ mod tests {
         let mut xmltv = XMLTV::new();
         xmltv.add_generator_info_name("xmltv-rs".into());
 
-        let channels = vec![("TF1", "1", Some("https://tf1.fr")), ("France 2", "2", None), ("France 3", "3", Some("https://www.france.tv/france-3"))];
+        let channels = vec![
+            ("TF1", "1", Some("https://tf1.fr"), None),
+            ("France 2", "2", None, Some("http://icon-france-2.fr")),
+            (
+                "France 3",
+                "3",
+                Some("https://www.france.tv/france-3"),
+                None,
+            ),
+        ];
 
         for elem in channels {
-            let display_name = XMLTVChannelDisplayName::new(
-            elem.0.into(),
-            None,
-            );
+            let display_name = XMLTVChannelDisplayName::new(elem.0.into(), None);
 
             let mut channel = XMLTVChannel::new(elem.0.into(), elem.1.into(), display_name);
             if let Some(url) = elem.2 {
                 channel.add_url(url.into());
             }
 
-            xmltv
-                .add_channel(channel)
-                .unwrap();
+            if let Some(icon) = elem.3 {
+                channel.add_icon(icon.into());
+            }
+
+            xmltv.add_channel(channel).unwrap();
         }
 
         let mut writer: Vec<u8> = Vec::new();
@@ -87,6 +92,7 @@ mod tests {
 \t</channel>
 \t<channel channel=\"France 2\" id=\"2\">
 \t\t<display-name>France 2</display-name>
+\t\t<icon src=\"http://icon-france-2.fr\" />
 \t</channel>
 \t<channel channel=\"France 3\" id=\"3\">
 \t\t<display-name>France 3</display-name>
