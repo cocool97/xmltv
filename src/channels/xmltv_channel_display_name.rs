@@ -1,3 +1,4 @@
+/// Structure representing a XMLTV channel display name.
 pub struct XMLTVChannelDisplayName {
     name: String,
     lang: Option<String>,

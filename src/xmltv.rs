@@ -4,6 +4,9 @@ use xml_builder::{XMLElement, XML};
 
 use crate::{Result, XMLTVChannel, XMLTVProgram};
 
+/// Root structure representing a XMLTV document.
+///
+/// Has to be feed with `XMLTVChannel` and `XMLTVProgram` elements.
 pub struct XMLTV {
     xml: XML,
     root_element: XMLElement,
@@ -15,6 +18,7 @@ impl Default for XMLTV {
         xml.set_header_rendering(false);
         xml.set_attribute_sorting(true);
 
+        // The root element is created first to be easily handled
         let root_element = XMLElement::new("tv");
 
         Self { xml, root_element }

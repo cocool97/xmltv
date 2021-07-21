@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use xmltv_rs::{XMLTVChannel, XMLTVChannelDisplayName, XMLTV};
+    use xmltv_rs::{XMLTVChannel, XMLTVChannelDisplayName, XMLTVProgram, XMLTV};
 
     #[test]
     fn test_empty_xmltv() {
@@ -46,6 +46,49 @@ mod tests {
 \t\t<display-name>TF1</display-name>
 \t</channel>
 </tv>\n";
+        let res = std::str::from_utf8(&writer).unwrap();
+
+        assert_eq!(res, expected, "Both values does not match...")
+    }
+
+    #[test]
+    pub fn test_xmltv_programs() {
+        let mut xmltv = XMLTV::new();
+
+        let programs = vec![
+            (
+                "1",
+                "2021-10-09 12:00:00 +0200",
+                "2021-10-09 13:00:00 +0200",
+            ),
+            (
+                "2",
+                "2021-10-09 12:20:00 +0200",
+                "2021-10-09 12:35:00 +0200",
+            ),
+            (
+                "3",
+                "2021-10-09 13:00:00 +0200",
+                "2021-10-09 13:40:00 +0200",
+            ),
+        ];
+
+        for program in programs {
+            let mut xmltv_program = XMLTVProgram::new(program.0.into(), program.1.into());
+            xmltv_program.add_stop_date(program.2.into());
+
+            xmltv.add_program(xmltv_program).unwrap();
+        }
+
+        let mut writer: Vec<u8> = Vec::new();
+        xmltv.build(&mut writer).unwrap();
+
+        let expected = "<tv>
+\t<programme channel=\"1\" start=\"2021-10-09 12:00:00 +0200\" stop=\"2021-10-09 13:00:00 +0200\" />
+\t<programme channel=\"2\" start=\"2021-10-09 12:20:00 +0200\" stop=\"2021-10-09 12:35:00 +0200\" />
+\t<programme channel=\"3\" start=\"2021-10-09 13:00:00 +0200\" stop=\"2021-10-09 13:40:00 +0200\" />
+</tv>\n";
+
         let res = std::str::from_utf8(&writer).unwrap();
 
         assert_eq!(res, expected, "Both values does not match...")

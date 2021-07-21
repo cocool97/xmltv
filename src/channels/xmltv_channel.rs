@@ -1,6 +1,7 @@
 use crate::{xmltv_error::Result, XMLTVChannelDisplayName};
 use xml_builder::XMLElement;
 
+/// Structure representing a XMLTV channel.
 pub struct XMLTVChannel {
     channel: String,
     id: String,
