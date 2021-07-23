@@ -41,7 +41,7 @@ impl XMLTVChannel {
         self.id.to_owned()
     }
 
-    pub fn as_xmlelement(self) -> Result<XMLElement> {
+    pub fn to_xmlelement(self) -> Result<XMLElement> {
         let mut xml_channel = XMLElement::new("channel");
         xml_channel.add_attribute("channel", &self.channel());
         xml_channel.add_attribute("id", &self.id());

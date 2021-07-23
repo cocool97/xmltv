@@ -59,7 +59,7 @@ impl XMLTVProgram {
             clumpidx: None,
             titles: vec![title],
             sub_titles: vec![],
-            descs: vec![]
+            descs: vec![],
         }
     }
 
@@ -151,7 +151,7 @@ impl XMLTVProgram {
         self.descs.push(desc);
     }
 
-    pub fn as_xmlelement(self) -> Result<XMLElement> {
+    pub fn to_xmlelement(self) -> Result<XMLElement> {
         let mut xml_program = XMLElement::new("programme");
         // Mandatory element attributes
         xml_program.add_attribute("start", &self.start());
