@@ -16,8 +16,12 @@ Feel free to contribute to the project and adding your PR's !
 To use this crate you just need to add this to your `Cargo.toml` file:
 
 ```toml
-[dependancies]
+[dependencies]
 xmltv-rs = "*"
 ```
 
 ## Examples
+
+```rust
+Examples are coming !
+```

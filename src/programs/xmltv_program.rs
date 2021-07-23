@@ -1,4 +1,7 @@
+use crate::xmltv_error::Result;
 use xml_builder::XMLElement;
+
+use super::{XMLTVProgramDescription, XMLTVProgramSubTitle, XMLTVProgramTitle};
 
 /// Structure representing a XMLTV program element.
 ///
@@ -17,9 +20,9 @@ pub struct XMLTVProgram {
     channel: String,
     clumpidx: Option<String>,
     // Childs
-    // title: Vec<String>,
-    // sub_title: Vec<String>,
-    // desc: Vec<String>,
+    titles: Vec<XMLTVProgramTitle>,
+    sub_titles: Vec<XMLTVProgramSubTitle>,
+    descs: Vec<XMLTVProgramDescription>,
     // credits: Option<String>,
     // date: Option<String>,
     // category: Vec<String>,
@@ -44,7 +47,7 @@ pub struct XMLTVProgram {
 }
 
 impl XMLTVProgram {
-    pub fn new(channel: String, start: String) -> Self {
+    pub fn new(channel: String, start: String, title: XMLTVProgramTitle) -> Self {
         Self {
             start,
             stop: None,
@@ -54,39 +57,54 @@ impl XMLTVProgram {
             videoplus: None,
             channel,
             clumpidx: None,
+            titles: vec![title],
+            sub_titles: vec![],
+            descs: vec![]
         }
     }
 
-    pub fn start(&self) -> String {
-        self.start.to_owned()
+    pub fn start(&self) -> &String {
+        &self.start
     }
 
-    pub fn stop(&self) -> Option<String> {
-        self.stop.to_owned()
+    pub fn stop(&self) -> Option<&String> {
+        self.stop.as_ref()
     }
 
-    pub fn pdc_start(&self) -> Option<String> {
-        self.pdc_start.to_owned()
+    pub fn pdc_start(&self) -> Option<&String> {
+        self.pdc_start.as_ref()
     }
 
-    pub fn vps_start(&self) -> Option<String> {
-        self.vps_start.to_owned()
+    pub fn vps_start(&self) -> Option<&String> {
+        self.vps_start.as_ref()
     }
 
-    pub fn showview(&self) -> Option<String> {
-        self.showview.to_owned()
+    pub fn showview(&self) -> Option<&String> {
+        self.showview.as_ref()
     }
 
-    pub fn videoplus(&self) -> Option<String> {
-        self.videoplus.to_owned()
+    pub fn videoplus(&self) -> Option<&String> {
+        self.videoplus.as_ref()
     }
 
-    pub fn channel(&self) -> String {
-        self.channel.to_owned()
+    pub fn channel(&self) -> &String {
+        &self.channel
     }
 
-    pub fn clumpidx(&self) -> Option<String> {
-        self.clumpidx.to_owned()
+    pub fn clumpidx(&self) -> Option<&String> {
+        self.clumpidx.as_ref()
+    }
+
+    pub fn titles(&self) -> &Vec<XMLTVProgramTitle> {
+        &self.titles
+    }
+
+    pub fn sub_titles(&self) -> &Vec<XMLTVProgramSubTitle> {
+        &self.sub_titles
+    }
+
+    pub fn descs(&self) -> &Vec<XMLTVProgramDescription> {
+        &self.descs
     }
 
     pub fn set_start(&mut self, start: String) {
@@ -121,7 +139,19 @@ impl XMLTVProgram {
         self.clumpidx = Some(clumpidx);
     }
 
-    pub(crate) fn as_xmlelement(self) -> XMLElement {
+    pub fn add_title(&mut self, title: XMLTVProgramTitle) {
+        self.titles.push(title);
+    }
+
+    pub fn add_sub_title(&mut self, sub_title: XMLTVProgramSubTitle) {
+        self.sub_titles.push(sub_title);
+    }
+
+    pub fn add_desc(&mut self, desc: XMLTVProgramDescription) {
+        self.descs.push(desc);
+    }
+
+    pub fn as_xmlelement(self) -> Result<XMLElement> {
         let mut xml_program = XMLElement::new("programme");
         // Mandatory element attributes
         xml_program.add_attribute("start", &self.start());
@@ -151,6 +181,40 @@ impl XMLTVProgram {
             xml_program.add_attribute("clumpidx", &clumpidx);
         }
 
-        xml_program
+        for title in self.titles() {
+            let mut element = XMLElement::new("title");
+            if let Some(lang) = &title.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(title.title.clone())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        for sub_title in self.sub_titles() {
+            let mut element = XMLElement::new("sub-title");
+            if let Some(lang) = &sub_title.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(sub_title.title.clone())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        for desc in self.descs() {
+            let mut element = XMLElement::new("desc");
+
+            if let Some(lang) = &desc.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(desc.desc.clone())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        Ok(xml_program)
     }
 }

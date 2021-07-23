@@ -64,7 +64,7 @@ impl XMLTV {
     }
 
     pub fn add_program(&mut self, program: XMLTVProgram) -> Result<()> {
-        Ok(self.root_element.add_child(program.as_xmlelement())?)
+        Ok(self.root_element.add_child(program.as_xmlelement()?)?)
     }
 
     pub fn render<W: Write>(mut self, writer: &mut W) -> Result<()> {

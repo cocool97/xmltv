@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use xmltv_rs::{XMLTVChannel, XMLTVChannelDisplayName, XMLTVProgram, XMLTV};
+    use xmltv_rs::{XMLTVChannel, XMLTVChannelDisplayName, XMLTVProgram, XMLTVProgramTitle, XMLTV};
 
     #[test]
     fn test_empty_xmltv() {
@@ -58,24 +58,34 @@ mod tests {
         let programs = vec![
             (
                 "1",
+                "Les feux de l'amour",
+                None,
                 "2021-10-09 12:00:00 +0200",
                 "2021-10-09 13:00:00 +0200",
             ),
             (
                 "2",
+                "Le journal",
+                Some("fr-FR"),
                 "2021-10-09 12:20:00 +0200",
                 "2021-10-09 12:35:00 +0200",
             ),
             (
                 "3",
+                "Le journal",
+                None,
                 "2021-10-09 13:00:00 +0200",
                 "2021-10-09 13:40:00 +0200",
             ),
         ];
 
         for program in programs {
-            let mut xmltv_program = XMLTVProgram::new(program.0.into(), program.1.into());
-            xmltv_program.add_stop_date(program.2.into());
+            let title = XMLTVProgramTitle {
+                title: program.1.into(),
+                lang: program.2.map(|v| v.into()),
+            };
+            let mut xmltv_program = XMLTVProgram::new(program.0.into(), program.3.into(), title);
+            xmltv_program.add_stop_date(program.4.into());
 
             xmltv.add_program(xmltv_program).unwrap();
         }
@@ -84,9 +94,15 @@ mod tests {
         xmltv.build(&mut writer).unwrap();
 
         let expected = "<tv>
-\t<programme channel=\"1\" start=\"2021-10-09 12:00:00 +0200\" stop=\"2021-10-09 13:00:00 +0200\" />
-\t<programme channel=\"2\" start=\"2021-10-09 12:20:00 +0200\" stop=\"2021-10-09 12:35:00 +0200\" />
-\t<programme channel=\"3\" start=\"2021-10-09 13:00:00 +0200\" stop=\"2021-10-09 13:40:00 +0200\" />
+\t<programme channel=\"1\" start=\"2021-10-09 12:00:00 +0200\" stop=\"2021-10-09 13:00:00 +0200\">
+\t\t<title>Les feux de l'amour</title>
+\t</programme>
+\t<programme channel=\"2\" start=\"2021-10-09 12:20:00 +0200\" stop=\"2021-10-09 12:35:00 +0200\">
+\t\t<title lang=\"fr-FR\">Le journal</title>
+\t</programme>
+\t<programme channel=\"3\" start=\"2021-10-09 13:00:00 +0200\" stop=\"2021-10-09 13:40:00 +0200\">
+\t\t<title>Le journal</title>
+\t</programme>
 </tv>\n";
 
         let res = std::str::from_utf8(&writer).unwrap();
