@@ -1,9 +1,5 @@
-mod desc;
-mod sub_title;
-mod title;
+mod models;
 mod xmltv_program;
 
-pub use desc::XMLTVProgramDescription;
-pub use sub_title::XMLTVProgramSubTitle;
-pub use title::XMLTVProgramTitle;
+pub use models::*;
 pub use xmltv_program::XMLTVProgram;

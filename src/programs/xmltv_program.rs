@@ -1,7 +1,9 @@
-use crate::xmltv_error::Result;
+use crate::{xmltv_error::Result, XMLTVProgramCredits};
 use xml_builder::XMLElement;
 
-use super::{XMLTVProgramDescription, XMLTVProgramSubTitle, XMLTVProgramTitle};
+use super::{
+    XMLTVProgramCategory, XMLTVProgramDescription, XMLTVProgramSubTitle, XMLTVProgramTitle,
+};
 
 /// Structure representing a XMLTV program element.
 ///
@@ -23,9 +25,9 @@ pub struct XMLTVProgram {
     titles: Vec<XMLTVProgramTitle>,
     sub_titles: Vec<XMLTVProgramSubTitle>,
     descs: Vec<XMLTVProgramDescription>,
-    // credits: Option<String>,
-    // date: Option<String>,
-    // category: Vec<String>,
+    credits: Option<XMLTVProgramCredits>,
+    date: Option<String>,
+    categories: Vec<XMLTVProgramCategory>,
     // keyword: Vec<String>,
     // language: Option<String>,
     // orig_language: Option<String>,
@@ -60,6 +62,9 @@ impl XMLTVProgram {
             titles: vec![title],
             sub_titles: vec![],
             descs: vec![],
+            credits: None,
+            date: None,
+            categories: vec![],
         }
     }
 
@@ -107,6 +112,18 @@ impl XMLTVProgram {
         &self.descs
     }
 
+    pub fn credits(&self) -> &Option<XMLTVProgramCredits> {
+        &self.credits
+    }
+
+    pub fn date(&self) -> Option<&String> {
+        self.date.as_ref()
+    }
+
+    pub fn categories(&self) -> &Vec<XMLTVProgramCategory> {
+        &self.categories
+    }
+
     pub fn set_start(&mut self, start: String) {
         self.start = start;
     }
@@ -149,6 +166,18 @@ impl XMLTVProgram {
 
     pub fn add_desc(&mut self, desc: XMLTVProgramDescription) {
         self.descs.push(desc);
+    }
+
+    pub fn add_credits(&mut self, credits: XMLTVProgramCredits) {
+        self.credits = Some(credits);
+    }
+
+    pub fn add_date(&mut self, date: String) {
+        self.date = Some(date);
+    }
+
+    pub fn add_category(&mut self, category: XMLTVProgramCategory) {
+        self.categories.push(category);
     }
 
     pub fn to_xmlelement(self) -> Result<XMLElement> {
@@ -211,6 +240,29 @@ impl XMLTVProgram {
             }
 
             element.add_text(desc.desc.clone())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        if let Some(credits) = self.credits() {
+            xml_program.add_child(credits.to_xmlelement()?)?;
+        }
+
+        if let Some(date) = self.date() {
+            let mut element = XMLElement::new("date");
+            element.add_text(date.to_owned())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        for category in self.categories() {
+            let mut element = XMLElement::new("category");
+
+            if let Some(lang) = &category.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(category.category.to_owned())?;
 
             xml_program.add_child(element)?;
         }
