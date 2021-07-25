@@ -1,9 +1,9 @@
-use crate::{xmltv_error::Result, XMLTVProgramCredits};
-use xml_builder::XMLElement;
-
-use super::{
-    XMLTVProgramCategory, XMLTVProgramDescription, XMLTVProgramSubTitle, XMLTVProgramTitle,
+use crate::{
+    xmltv_error::Result, XMLTVProgramCategory, XMLTVProgramCredits, XMLTVProgramDescription,
+    XMLTVProgramIcon, XMLTVProgramKeyword, XMLTVProgramLanguage, XMLTVProgramLength,
+    XMLTVProgramOrigLanguage, XMLTVProgramSubTitle, XMLTVProgramTitle,
 };
+use xml_builder::XMLElement;
 
 /// Structure representing a XMLTV program element.
 ///
@@ -28,11 +28,11 @@ pub struct XMLTVProgram {
     credits: Option<XMLTVProgramCredits>,
     date: Option<String>,
     categories: Vec<XMLTVProgramCategory>,
-    // keyword: Vec<String>,
-    // language: Option<String>,
-    // orig_language: Option<String>,
-    // length: Option<String>,
-    // icon: Vec<String>,
+    keywords: Vec<XMLTVProgramKeyword>,
+    language: Option<XMLTVProgramLanguage>,
+    orig_language: Option<XMLTVProgramOrigLanguage>,
+    length: Option<XMLTVProgramLength>,
+    icons: Vec<XMLTVProgramIcon>,
     // url: Vec<String>,
     // country: Vec<String>,
     // episode_num: Vec<String>,
@@ -65,63 +65,12 @@ impl XMLTVProgram {
             credits: None,
             date: None,
             categories: vec![],
+            keywords: vec![],
+            language: None,
+            orig_language: None,
+            length: None,
+            icons: vec![],
         }
-    }
-
-    pub fn start(&self) -> &String {
-        &self.start
-    }
-
-    pub fn stop(&self) -> Option<&String> {
-        self.stop.as_ref()
-    }
-
-    pub fn pdc_start(&self) -> Option<&String> {
-        self.pdc_start.as_ref()
-    }
-
-    pub fn vps_start(&self) -> Option<&String> {
-        self.vps_start.as_ref()
-    }
-
-    pub fn showview(&self) -> Option<&String> {
-        self.showview.as_ref()
-    }
-
-    pub fn videoplus(&self) -> Option<&String> {
-        self.videoplus.as_ref()
-    }
-
-    pub fn channel(&self) -> &String {
-        &self.channel
-    }
-
-    pub fn clumpidx(&self) -> Option<&String> {
-        self.clumpidx.as_ref()
-    }
-
-    pub fn titles(&self) -> &Vec<XMLTVProgramTitle> {
-        &self.titles
-    }
-
-    pub fn sub_titles(&self) -> &Vec<XMLTVProgramSubTitle> {
-        &self.sub_titles
-    }
-
-    pub fn descs(&self) -> &Vec<XMLTVProgramDescription> {
-        &self.descs
-    }
-
-    pub fn credits(&self) -> &Option<XMLTVProgramCredits> {
-        &self.credits
-    }
-
-    pub fn date(&self) -> Option<&String> {
-        self.date.as_ref()
-    }
-
-    pub fn categories(&self) -> &Vec<XMLTVProgramCategory> {
-        &self.categories
     }
 
     pub fn set_start(&mut self, start: String) {
@@ -180,37 +129,57 @@ impl XMLTVProgram {
         self.categories.push(category);
     }
 
+    pub fn add_keyword(&mut self, keyword: XMLTVProgramKeyword) {
+        self.keywords.push(keyword);
+    }
+
+    pub fn set_language(&mut self, language: XMLTVProgramLanguage) {
+        self.language = Some(language);
+    }
+
+    pub fn set_orig_language(&mut self, orig_language: XMLTVProgramOrigLanguage) {
+        self.orig_language = Some(orig_language);
+    }
+
+    pub fn set_length(&mut self, length: XMLTVProgramLength) {
+        self.length = Some(length);
+    }
+
+    pub fn add_icon(&mut self, icon: XMLTVProgramIcon) {
+        self.icons.push(icon);
+    }
+
     pub fn to_xmlelement(self) -> Result<XMLElement> {
         let mut xml_program = XMLElement::new("programme");
         // Mandatory element attributes
-        xml_program.add_attribute("start", &self.start());
-        xml_program.add_attribute("channel", &self.channel());
+        xml_program.add_attribute("start", &self.start);
+        xml_program.add_attribute("channel", &self.channel);
 
-        if let Some(stop) = self.stop() {
+        if let Some(stop) = self.stop {
             xml_program.add_attribute("stop", &stop);
         }
 
-        if let Some(pdc_start) = self.pdc_start() {
+        if let Some(pdc_start) = self.pdc_start {
             xml_program.add_attribute("pdc-start", &pdc_start);
         }
 
-        if let Some(vps_start) = self.vps_start() {
+        if let Some(vps_start) = self.vps_start {
             xml_program.add_attribute("vps-start", &vps_start);
         }
 
-        if let Some(showview) = self.showview() {
+        if let Some(showview) = self.showview {
             xml_program.add_attribute("showview", &showview);
         }
 
-        if let Some(videoplus) = self.videoplus() {
+        if let Some(videoplus) = self.videoplus {
             xml_program.add_attribute("videoplus", &videoplus);
         }
 
-        if let Some(clumpidx) = self.clumpidx() {
+        if let Some(clumpidx) = self.clumpidx {
             xml_program.add_attribute("clumpidx", &clumpidx);
         }
 
-        for title in self.titles() {
+        for title in self.titles {
             let mut element = XMLElement::new("title");
             if let Some(lang) = &title.lang {
                 element.add_attribute("lang", lang);
@@ -221,7 +190,7 @@ impl XMLTVProgram {
             xml_program.add_child(element)?;
         }
 
-        for sub_title in self.sub_titles() {
+        for sub_title in self.sub_titles {
             let mut element = XMLElement::new("sub-title");
             if let Some(lang) = &sub_title.lang {
                 element.add_attribute("lang", lang);
@@ -232,7 +201,7 @@ impl XMLTVProgram {
             xml_program.add_child(element)?;
         }
 
-        for desc in self.descs() {
+        for desc in self.descs {
             let mut element = XMLElement::new("desc");
 
             if let Some(lang) = &desc.lang {
@@ -244,18 +213,18 @@ impl XMLTVProgram {
             xml_program.add_child(element)?;
         }
 
-        if let Some(credits) = self.credits() {
+        if let Some(credits) = self.credits {
             xml_program.add_child(credits.to_xmlelement()?)?;
         }
 
-        if let Some(date) = self.date() {
+        if let Some(date) = self.date {
             let mut element = XMLElement::new("date");
             element.add_text(date.to_owned())?;
 
             xml_program.add_child(element)?;
         }
 
-        for category in self.categories() {
+        for category in self.categories {
             let mut element = XMLElement::new("category");
 
             if let Some(lang) = &category.lang {
@@ -263,6 +232,66 @@ impl XMLTVProgram {
             }
 
             element.add_text(category.category.to_owned())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        for keyword in self.keywords {
+            let mut element = XMLElement::new("keyword");
+
+            if let Some(lang) = &keyword.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(keyword.keyword.to_owned())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        if let Some(language) = self.language {
+            let mut element = XMLElement::new("language");
+
+            if let Some(lang) = &language.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(language.language.to_owned())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        if let Some(orig_language) = self.orig_language {
+            let mut element = XMLElement::new("orig_language");
+
+            if let Some(lang) = &orig_language.lang {
+                element.add_attribute("lang", lang);
+            }
+
+            element.add_text(orig_language.orig_language.to_owned())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        if let Some(length) = self.length {
+            let mut element = XMLElement::new("length");
+
+            element.add_attribute("units", &length.units.to_string());
+            element.add_text(length.length.to_string())?;
+
+            xml_program.add_child(element)?;
+        }
+
+        for icon in self.icons {
+            let mut element = XMLElement::new("icon");
+            element.add_attribute("src", &icon.src);
+
+            if let Some(width) = icon.width {
+                element.add_attribute("width", &width);
+            }
+
+            if let Some(height) = icon.height {
+                element.add_attribute("height", &height);
+            }
 
             xml_program.add_child(element)?;
         }
