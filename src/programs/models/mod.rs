@@ -1,5 +1,6 @@
 mod actor;
 mod category;
+mod country;
 mod credits;
 mod desc;
 mod icon;
@@ -12,6 +13,7 @@ mod title;
 
 pub use actor::XMLTVProgramActor;
 pub use category::XMLTVProgramCategory;
+pub use country::XMLTVProgramCountry;
 pub use credits::XMLTVProgramCredits;
 pub use desc::XMLTVProgramDescription;
 pub use icon::XMLTVProgramIcon;

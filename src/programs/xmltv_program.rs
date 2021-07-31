@@ -1,7 +1,7 @@
 use crate::{
-    xmltv_error::Result, XMLTVProgramCategory, XMLTVProgramCredits, XMLTVProgramDescription,
-    XMLTVProgramIcon, XMLTVProgramKeyword, XMLTVProgramLanguage, XMLTVProgramLength,
-    XMLTVProgramOrigLanguage, XMLTVProgramSubTitle, XMLTVProgramTitle,
+    xmltv_error::Result, XMLTVProgramCategory, XMLTVProgramCountry, XMLTVProgramCredits,
+    XMLTVProgramDescription, XMLTVProgramIcon, XMLTVProgramKeyword, XMLTVProgramLanguage,
+    XMLTVProgramLength, XMLTVProgramOrigLanguage, XMLTVProgramSubTitle, XMLTVProgramTitle,
 };
 use xml_builder::XMLElement;
 
@@ -33,8 +33,7 @@ pub struct XMLTVProgram {
     orig_language: Option<XMLTVProgramOrigLanguage>,
     length: Option<XMLTVProgramLength>,
     icons: Vec<XMLTVProgramIcon>,
-    // url: Vec<String>,
-    // country: Vec<String>,
+    countries: Vec<XMLTVProgramCountry>,
     // episode_num: Vec<String>,
     // video: Option<String>,
     // audio: Option<String>,
@@ -70,6 +69,7 @@ impl XMLTVProgram {
             orig_language: None,
             length: None,
             icons: vec![],
+            countries: vec![],
         }
     }
 
@@ -147,6 +147,10 @@ impl XMLTVProgram {
 
     pub fn add_icon(&mut self, icon: XMLTVProgramIcon) {
         self.icons.push(icon);
+    }
+
+    pub fn add_country(&mut self, country: XMLTVProgramCountry) {
+        self.countries.push(country);
     }
 
     pub fn to_xmlelement(self) -> Result<XMLElement> {
@@ -293,6 +297,17 @@ impl XMLTVProgram {
                 element.add_attribute("height", &height);
             }
 
+            xml_program.add_child(element)?;
+        }
+
+        for country in self.countries {
+            let mut element = XMLElement::new("country");
+
+            if let Some(lang) = country.lang {
+                element.add_attribute("lang", &lang);
+            }
+
+            element.add_text(country.country.to_owned())?;
             xml_program.add_child(element)?;
         }
 
